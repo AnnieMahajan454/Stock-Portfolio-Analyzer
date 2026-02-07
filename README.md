@@ -102,8 +102,8 @@ StockPortfolioProject/
 
 ### Prerequisites
 - Python 3.8 or higher
-- PostgreSQL 12 or higher
 - pip (Python package manager)
+- **Optional:** PostgreSQL 12+ (for production; SQLite used by default)
 
 ### Step 1: Clone Repository
 ```bash
@@ -112,11 +112,11 @@ cd StockPortfolioProject
 
 ### Step 2: Create Virtual Environment
 ```bash
-python -m venv venv
+python -m venv .venv
 
 # Activate virtual environment
 # On Windows:
-venv\Scripts\activate
+.venv\Scripts\activate
 # On macOS/Linux:
 source venv/bin/activate
 ```
@@ -144,80 +144,129 @@ python -c "from database.db_connection import DatabaseConnection; from config.co
 
 ## ⚙️ Configuration
 
+### Database Options
+
+**Default (SQLite)** - No additional setup required
+```env
+DB_TYPE=sqlite
+```
+
+**PostgreSQL** (optional) - For production use
+```env
+DB_TYPE=postgresql
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=stock_portfolio
+DB_USER=postgres
+DB_PASSWORD=your_password_here
+```
+
 ### Environment Variables (.env)
 
 ```env
-# PostgreSQL Configuration
-DB_HOST=localhost                    # Database server hostname
-DB_PORT=5432                         # PostgreSQL port
-DB_NAME=stock_portfolio              # Database name
-DB_USER=postgres                     # Database user
-DB_PASSWORD=your_password_here       # Database password
+# Database: 'sqlite' (default) or 'postgresql'
+DB_TYPE=sqlite
 
-# API Configuration
-YFINANCE_API_KEY=default             # yfinance API key
+# PostgreSQL (optional, only if using PostgreSQL)
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=stock_portfolio
+DB_USER=postgres
+DB_PASSWORD=your_password_here
+
+# yfinance - Fetches LIVE stock prices (free, auto-enabled)
+YFINANCE_API_KEY=default
 
 # Financial Settings
-RISK_FREE_RATE=0.02                  # Annual risk-free rate (2%)
-
-# File Management
-DATA_EXPORT_PATH=./data/             # Directory for CSV exports
+RISK_FREE_RATE=0.02                  # Annual risk-free rate
 
 # Logging
-LOG_LEVEL=INFO                       # Logging level (DEBUG, INFO, WARNING, ERROR)
-
-# Power BI Integration
-POWERBI_WORKSPACE_ID=your_id         # Power BI workspace ID
-POWERBI_DATASET_ID=your_id           # Power BI dataset ID
+LOG_LEVEL=INFO
 ```
 
-### PostgreSQL Setup
+### Live Stock Prices
 
-```bash
-# Connect to PostgreSQL
-psql -U postgres
-
-# Create database
-CREATE DATABASE stock_portfolio;
-
-# Create user (optional)
-CREATE USER portfolio_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE stock_portfolio TO portfolio_user;
-```
+App automatically fetches **live market prices** from yfinance:
+- Real-time AAPL, MSFT, GOOGL prices
+- Free API (no keys needed)
+- Portfolio updates dynamically
 
 ---
 
-## 💻 Usage
+## 🎯 Usage
 
-### Quick Start
-
-```python
-from main import PortfolioAnalyzer
-
-# Initialize analyzer
-analyzer = PortfolioAnalyzer()
-analyzer.initialize_database()
-
-# Create portfolio
-analyzer.portfolio_model.create_portfolio("My Portfolio", "Personal investments")
-
-# Add stocks
-analyzer.add_stock_to_portfolio("My Portfolio", "AAPL", shares=10, purchase_price=150.00)
-analyzer.add_stock_to_portfolio("My Portfolio", "MSFT", shares=5, purchase_price=300.00)
-
-# Update prices
-analyzer.update_portfolio_prices("My Portfolio")
-
-# Calculate metrics
-metrics = analyzer.calculate_portfolio_metrics("My Portfolio")
-print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.4f}")
-print(f"Annual Volatility: {metrics['annual_volatility']:.4f}")
-```
-
-### Running the Application
+### Quick Start (Flask Dashboard)
 
 ```bash
-# Run main application
+# 1. Activate virtual environment
+.venv\Scripts\activate
+
+# 2. Run the Flask app
+python app.py
+
+# 3. Open http://localhost:5000 in your browser
+```
+
+**What you'll see:**
+- Real-time portfolio dashboard with live stock prices
+- 4 tabs: Overview, Risk Analysis, Holdings, Transactions
+- Interactive charts showing portfolio performance
+- KPI cards with gain/loss calculations
+
+---
+
+## 💻 Running the Application
+
+### Deploy Flask Dashboard
+
+```bash
+# Activate virtual environment
+.venv\Scripts\activate
+
+# Run Flask server
+python app.py
+```
+
+Open http://localhost:5000 in browser
+
+### Using PostgreSQL
+
+Update `.env` to use PostgreSQL instead of SQLite:
+
+```env
+DB_TYPE=postgresql
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=stock_portfolio
+DB_USER=postgres
+DB_PASSWORD=your_secure_password
+```
+
+Then run `python app.py` - the app automatically switches to PostgreSQL.
+
+---
+
+## 🎯 Customization
+
+### Add Custom Holdings
+
+Edit the `HOLDINGS` list in `app.py`:
+
+```python
+HOLDINGS = [
+    {"ticker": "TSLA", "shares": 5, "purchase_price": 250.00, "purchase_date": "2024-01-15"},
+    {"ticker": "META", "shares": 10, "purchase_price": 350.00, "purchase_date": "2024-02-10"},
+]
+```
+
+Prices auto-fetch from yfinance.
+
+### Portfolio Value Calculation
+
+Current implementation:
+- Fetches real-time prices for each holding
+- Calculates gain/loss vs. purchase price
+- Computes total portfolio value
 python main.py
 
 # View logs
