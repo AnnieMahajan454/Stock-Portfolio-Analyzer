@@ -1,0 +1,4 @@
+stock_id,ticker,company_name,sector,industry,market_cap,pe_ratio,dividend_yield,beta
+1,AAPL,Apple Inc.,Technology,Electronics,2800000.0,28.5,0.4,1.2
+2,MSFT,Microsoft Corp.,Technology,Software,2400000.0,35.2,0.7,1.0
+3,GOOGL,Alphabet Inc.,Technology,Internet Services,1600000.0,24.3,0.0,1.1
